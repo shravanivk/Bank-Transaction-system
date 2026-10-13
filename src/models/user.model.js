@@ -1,54 +1,70 @@
+
 const mongoose = require("mongoose");
+
 const bcrypt = require("bcryptjs");
+
 const userSchema = new mongoose.Schema(
-  {
-    email: {
-      type: String,
-      required: [true, "Email is required for creating a user"],
-      trim: true,
-      lowercase: true,
-      match: [/^[^\s@]+@[^\s@]+\.[^\s@]+$/, "Invalid email address"],
-      unique: true
-    },
+    {
+        // User email
+        email: {
+            type: String,
+            required: [true, "Email is required for creating a user"],
+            trim: true,
+            lowercase: true,
+            match: [/^[^\s@]+@[^\s@]+\.[^\s@]+$/, "Invalid email address"],
+            unique: true
+        },
 
-    name: {
-      type: String,
-      required: [true, "Name is required for creating a user"],
-      trim: true
-    },
+        // User name
+        name: {
+            type: String,
+            required: [true, "Name is required for creating a user"],
+            trim: true
+        },
 
-    password: {
-      type: String,
-      required: [true, "Password is required for creating a user"],
-      minlength: [6, "Password should contain minimum 6 characters"],
-      select: false
+        // User password
+        password: {
+            type: String,
+            required: [true, "Password is required for creating a user"],
+            minlength: [6, "Password should contain minimum 6 characters"],
+            select: false
+        }
+    },
+    {
+        timestamps: true
     }
-  },
-  {
-    timestamps: true
-  }
 );
 
 
-userSchema.pre("save",async function(next){
+// Hash password before saving the user
+userSchema.pre("save", async function () {
 
-  if(!this.isModified("password")){//checks if password was changed
-  return next()//skip the password-hashing code and continue saving
+    // If password has not been changed,
+    // don't hash it again
+    if (!this.isModified("password")) {
+        return;
+    }
 
-  const hash=await bcrypt.hash(this.password ,10)
-this.password=hash//again stored it in passwoed
-return next()
+    // Hash the password using bcrypt
+    const hash = await bcrypt.hash(this.password, 10);
 
-}
-})
-
-userSchema.method.comparePassword=async function(password){
-  return await bcrypt.compare(password,this.password)//This code is used to check whether the password entered during login matches the hashed password stored in the database.
-}
-const userModel=mongoose.model("user",userSchema)
-module.exports=userModel
+    // Store the hashed password
+    this.password = hash;
+});
 
 
+// Compare entered password with the hashed password
+userSchema.methods.comparePassword = async function (password) {
+
+    return await bcrypt.compare(password, this.password);
+
+};
 
 
-//module.exports = mongoose.model("User", userSchema);
+// Create the User model
+const userModel = mongoose.model("user", userSchema);
+
+
+// Export the User model
+module.exports = userModel;
+

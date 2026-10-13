@@ -1,9 +1,14 @@
-const express=require("express")
-const cookieparser=require("cookie-parser")
-const router=express.Router()
-const authRouter=require("./routes/auth.routes")
-app.use(express.json())
-app.use("/api/auth",authRouter)//strating with api and auth will redirect to authRouter
-app.use(cookieparser())
+const express = require("express");
+const cookieparser = require("cookie-parser");
 
-module.exports=app
+const app = express();
+
+const authRouter = require("./routes/auth.routes");
+
+app.use(express.json());
+
+app.use(cookieparser());
+
+app.use("/api/auth", authRouter);
+
+module.exports = app;
