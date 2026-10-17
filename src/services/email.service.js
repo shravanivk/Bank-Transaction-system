@@ -1,9 +1,13 @@
 //all the third party things used are stored in services
+
 require("dotenv").config();
+
 const nodemailer = require("nodemailer");
-console.log("EMAIL_USER:", process.env.EMAIL_USER);
-console.log("CLIENT_ID:", process.env.CLIENT_ID);
-console.log("REFRESH_TOKEN exists:", !!process.env.REFRESH_TOKEN);
+
+//console.log("EMAIL_USER:", process.env.EMAIL_USER);
+//console.log("CLIENT_ID:", process.env.CLIENT_ID);
+//console.log("REFRESH_TOKEN exists:", !!process.env.REFRESH_TOKEN);
+
 const transporter = nodemailer.createTransport({
     service: "gmail",
     auth: {
@@ -15,8 +19,15 @@ const transporter = nodemailer.createTransport({
     }
 });
 
-async function sendRegistrationEmail(userEmail, name) {
+transporter.verify((error, success) => {
+    if (error) {
+        console.log("Email transporter error:", error);
+    } else {
+        console.log("Email is ready to send messages");
+    }
+});
 
+async function sendRegistrationEmail(userEmail, name) {
     const info = await transporter.sendMail({
         from: `"Backend Ledger" <${process.env.EMAIL_USER}>`,
         to: userEmail,
@@ -30,7 +41,6 @@ The Backend Ledger Team`,
 
         html: `
             <div style="font-family: Arial, sans-serif; padding: 20px;">
-                
                 <h2>Welcome to Backend Ledger!</h2>
 
                 <p>Hello ${name},</p>
@@ -44,13 +54,22 @@ The Backend Ledger Team`,
                     Best regards,<br>
                     The Backend Ledger Team
                 </p>
-
             </div>
         `
     });
 
     console.log("Email sent:", info.messageId);
 }
+
+async function sendTransactionEmail(userEmail, name, amount, toAccount) {
+    const subject = "Transaction Successful!";
+
+    const text = `Hello ${name},\n\nYour transaction of $${amount} to account ${toAccount} was successful.`;
+
+    const html = `<p>Hello <b>${name}</b>,</p><p>Your transaction of <b>$${amount}</b> to account <b>${toAccount}</b> was successful.</p>`;
+
+}
+
 
 module.exports = {
     sendRegistrationEmail
