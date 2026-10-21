@@ -13,5 +13,8 @@ app.use(cookieparser());
 app.use("/api/auth", authRouter);
 app.use("/api/accounts", accountRouter);
 app.use("/api/transactions",transactionRoutes)
+app.get("/", (req, res) => {
+    res.send("Bank Transaction System API is running");
+});
 
 module.exports = app;
