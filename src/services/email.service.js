@@ -1,12 +1,12 @@
-//all the third party things used are stored in services
+// all the third party things used are stored in services
 
 require("dotenv").config();
 
 const nodemailer = require("nodemailer");
 
-//console.log("EMAIL_USER:", process.env.EMAIL_USER);
-//console.log("CLIENT_ID:", process.env.CLIENT_ID);
-//console.log("REFRESH_TOKEN exists:", !!process.env.REFRESH_TOKEN);
+// console.log("EMAIL_USER:", process.env.EMAIL_USER);
+// console.log("CLIENT_ID:", process.env.CLIENT_ID);
+// console.log("REFRESH_TOKEN exists:", !!process.env.REFRESH_TOKEN);
 
 const transporter = nodemailer.createTransport({
     service: "gmail",
@@ -64,13 +64,31 @@ The Backend Ledger Team`,
 async function sendTransactionEmail(userEmail, name, amount, toAccount) {
     const subject = "Transaction Successful!";
 
-    const text = `Hello ${name},\n\nYour transaction of $${amount} to account ${toAccount} was successful.`;
+    const text = `Hello ${name},
 
-    const html = `<p>Hello <b>${name}</b>,</p><p>Your transaction of <b>$${amount}</b> to account <b>${toAccount}</b> was successful.</p>`;
+Your transaction of $${amount} to account ${toAccount} was successful.`;
 
+    const html = `<p>Hello <b>${name}</b>,</p>
+                  <p>Your transaction of <b>$${amount}</b> to account <b>${toAccount}</b> was successful.</p>`;
+
+    await sendEmail(userEmail, subject, text, html);
 }
 
+async function sendTransactionFailureEmail(userEmail, name, amount, toAccount) {
+    const subject = "Transaction Failed";
+
+    const text = `Hello ${name},
+
+We regret to inform you that your transaction of $${amount} to account ${toAccount} was unsuccessful.`;
+
+    const html = `<p>Hello ${name},</p>
+                  <p>We regret to inform you that your transaction of $${amount} to account ${toAccount} was unsuccessful.</p>`;
+
+    await sendEmail(userEmail, subject, text, html);
+}
 
 module.exports = {
-    sendRegistrationEmail
+    sendRegistrationEmail,
+    sendTransactionEmail,
+    sendTransactionFailureEmail
 };
